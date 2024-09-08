@@ -1,7 +1,7 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 
-const JWT_SECRET = "harkirat123";
+const JWT_SECRET = "kirat123123";
 
 const app = express();
 app.use(express.json());
@@ -12,6 +12,11 @@ function logger(req, res, next) {
     console.log(req.method + " request came");
     next();
 }
+
+// localhost:3000
+app.get("/", function(req, res) {
+    res.sendFile(__dirname + "/public/index.html");
+})
 
 app.post("/signup", logger, function(req, res) {
     const username = req.body.username
@@ -47,7 +52,7 @@ app.post("/signin", logger, function(req, res) {
         return 
     } else {
         const token = jwt.sign({
-            username: "raman"
+            username: users[i].username
         }, JWT_SECRET);
         res.header("jwt", token);
 
@@ -64,7 +69,8 @@ function auth(req, res, next) {
     const decodedData = jwt.verify(token, JWT_SECRET);
 
     if (decodedData.username) {
-        req.username = decodedData.username;
+        // req = {status, headers...., username, password, userFirstName, random; ":123123"}
+        req.username = decodedData.username
         next()
     } else {
         res.json({
@@ -73,13 +79,15 @@ function auth(req, res, next) {
     }
 }
 
-
 app.get("/me", logger, auth, function(req, res) {
-    
-    let foundUser = null;
+    // req = {status, headers...., username, password, userFirstName, random; ":123123"}
+    const currentUser = req.username;
+    // const token = req.headers.token;
+    // const decodedData = jwt.verify(token, JWT_SECRET);
+    // const currentUser = decodedData.username
 
     for (let i = 0; i < users.length; i++) {
-        if (users[i].username === req.username) {
+        if (users[i].username === currentUser) {
             foundUser = users[i]
         }
     }
